@@ -22,26 +22,74 @@ class GridScreen extends Component {
     this.gridRef = null;
     this.state = {
       snakePosition: [1, 0],
+      gameState: 'inGame',
+      direction: 'right',
     };
   }
 
   componentDidMount() {
     this.gridRef.focus();
+    setInterval(() => this.moveSnakeInDirection(), 1000);
   }
 
-  moveSnake(e) {
-    console.log('coucou');
-    if (e.key === 'ArrowLeft') {
+  moveSnakeInDirection() {
+    if (this.state.direction === 'left') {
       this.setState(changeSnakePos(-1, 0));
+    } else if (this.state.direction === 'right') {
+      this.setState(changeSnakePos(1, 0));
+    } else if (this.state.direction === 'down') {
+      this.setState(changeSnakePos(0, 1));
+    } else if (this.state.direction === 'up') {
+      this.setState(changeSnakePos(0, -1));
+    }
+    this.checkBordersCollision();
+  }
+
+  checkDirection(e) {
+    if (e.key === 'ArrowLeft') {
+      this.setState({ direction: 'left' });
     }
     if (e.key === 'ArrowRight') {
-      this.setState(changeSnakePos(1, 0));
+      this.setState({ direction: 'right' });
     }
     if (e.key === 'ArrowDown') {
-      this.setState(changeSnakePos(0, 1));
+      this.setState({ direction: 'down' });
     }
     if (e.key === 'ArrowUp') {
-      this.setState(changeSnakePos(0, -1));
+      this.setState({ direction: 'up' });
+    }
+  }
+
+  checkBordersCollision() {
+    console.log('check');
+    const { snakePosition } = this.state;
+    const isOverLeftBorder = snakePosition[0] < 0;
+    const isOverRightBorder = snakePosition[0] > NB_CELLS_COLUMN.length - 1;
+    const isOverBottomBorder = snakePosition[1] > NB_CELLS_ROW.length - 1;
+    const isOverTopBorder = snakePosition[1] < 0;
+
+    if (
+      isOverLeftBorder ||
+      isOverRightBorder ||
+      isOverBottomBorder ||
+      isOverTopBorder
+    ) {
+      this.changeGameState('gameOver');
+    }
+  }
+
+  changeGameState(gameState) {
+    this.setState(
+      {
+        gameState,
+      },
+      () => this.checkGameState(this.state.gameState)
+    );
+  }
+
+  checkGameState(gameState) {
+    if (gameState === 'gameOver') {
+      console.log('perdu');
     }
   }
 
@@ -60,7 +108,7 @@ class GridScreen extends Component {
       <Grid
         tabIndex="-1"
         ref={gridRef => (this.gridRef = gridRef)}
-        onKeyDown={this.moveSnake.bind(this)}
+        onKeyDown={this.checkDirection.bind(this)}
       >
         {NB_CELLS_COLUMN.map(cellColumn => {
           return (
