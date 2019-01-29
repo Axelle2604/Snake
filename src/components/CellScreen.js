@@ -5,7 +5,8 @@ const Cell = styled.div`
 border: solid 1px #ecf0f1
 height: 50px;
 width: 50px;
-background-color: ${props => (props.isSnake ? '#2ecc71' : '#ffffff')};
+background-color: ${props =>
+  props.isSnake ? '#2ecc71' : props.isFruit ? '#e67e22' : '#ffffff'};
 `;
 
 class CellScreen extends Component {
@@ -17,7 +18,7 @@ class CellScreen extends Component {
   }
 
   render() {
-    return <Cell isSnake={this.props.value} />;
+    return <Cell isSnake={this.props.isSnake} isFruit={this.props.isFruit} />;
   }
 }
 
